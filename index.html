@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streamflix</title>
+<style>
+  :root {
+    --bg: #141414;
+    --red: #e50914;
+    --text: #ffffff;
+    --muted: #b3b3b3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 18px 4%;
+    background: linear-gradient(to bottom, rgba(0,0,0,.85), rgba(0,0,0,0));
+  }
+  .logo {
+    color: var(--red);
+    font-size: 1.9rem;
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-decoration: none;
+  }
+  nav {
+    display: flex;
+    gap: 18px;
+    font-size: .95rem;
+  }
+  nav button {
+    background: none;
+    border: 0;
+    color: var(--muted);
+    font: inherit;
+    cursor: pointer;
+  }
+  nav button:hover,
+  nav button.active { color: #fff; }
+  .stage {
+    padding: 90px 4% 0;
+    background:
+      radial-gradient(ellipse at 50% 0%, #3a0a0d 0%, rgba(20,20,20,0) 65%),
+      var(--bg);
+  }
+  .player {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+  }
+  .player iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+  .placeholder {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: radial-gradient(circle at 50% 30%, #3a1014, #0b0b0b);
+    text-align: center;
+    padding: 24px;
+  }
+  .placeholder.visible { display: flex; }
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--red);
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: .08em;
+    font-size: .75rem;
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+  .live-pill::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .35; }
+  }
+  .placeholder h2 { font-size: 1.6rem; }
+  .placeholder p { color: var(--muted); max-width: 42ch; }
+  .info {
+    max-width: 1100px;
+    margin: 28px auto 0;
+  }
+  .info h1 {
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    color: var(--muted);
+    font-size: .95rem;
+    margin-bottom: 14px;
+  }
+  .match { color: #46d369; font-weight: 700; }
+  .badge {
+    border: 1px solid var(--muted);
+    padding: 0 6px;
+    font-size: .8rem;
+  }
+  .info p {
+    max-width: 62ch;
+    color: #d2d2d2;
+    font-size: 1.05rem;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .btn {
+    border: 0;
+    border-radius: 4px;
+    padding: 10px 26px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn.primary { background: #fff; color: #000; }
+  .btn.secondary { background: rgba(109,109,110,.7); color: #fff; }
+  .btn:hover { opacity: .85; }
+  .btn:focus-visible, .logo:focus-visible, nav button:focus-visible, .card:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+  .rail {
+    max-width: 1100px;
+    margin: 36px auto 0;
+    padding-bottom: 50px;
+  }
+  .rail h2 {
+    font-size: 1.2rem;
+    margin-bottom: 14px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    position: relative;
+    text-align: left;
+    border: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #222;
+    color: inherit;
+    font: inherit;
+    min-height: 124px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .card:hover { transform: scale(1.04); }
+  .card.active { box-shadow: 0 0 0 2px #fff; }
+  .card.live-card {
+    background: linear-gradient(160deg, #7a1018, #1a0506);
+  }
+  .card .tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    background: var(--red);
+    padding: 2px 7px;
+    border-radius: 2px;
+  }
+  .card strong { font-size: 1.05rem; }
+  .card span { color: #cfcfcf; font-size: .85rem; margin-top: 4px; }
+  footer {
+    text-align: center;
+    color: #737373;
+    font-size: .85rem;
+    padding: 30px 4% 40px;
+    border-top: 1px solid #222;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#">STREAMFLIX</a>
+  <nav>
+    <button type="button" data-filter="all" class="active">Home</button>
+    <button type="button" data-filter="live">Live</button>
+    <button type="button" data-filter="movie">Movies</button>
+  </nav>
+</header>
+
+<main class="stage">
+  <div class="player">
+    <iframe id="playerFrame" title="Video player" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <div id="placeholder" class="placeholder" aria-live="polite">
+      <span class="live-pill">LIVE</span>
+      <h2>NPL Season 3</h2>
+      <p>Broadcast embed is empty for now. Paste the stream link when you have it.</p>
+    </div>
+  </div>
+
+  <section class="info">
+    <h1 id="title"></h1>
+    <div class="meta" id="meta"></div>
+    <p id="description"></p>
+    <div class="actions">
+      <button class="btn primary" id="fullscreenBtn" type="button">Full screen</button>
+      <button class="btn secondary" id="restartBtn" type="button">Restart</button>
+    </div>
+  </section>
+
+  <section class="rail">
+    <h2>Now on Streamflix</h2>
+    <div class="cards" id="cards"></div>
+  </section>
+</main>
+
+<footer>&copy; 2026 Streamflix. All rights reserved.</footer>
+
+<script>
+  const catalog = [
+    {
+      id: "npl-s3",
+      kind: "live",
+      title: "NPL Season 3 Live Broadcast",
+      year: "2026",
+      duration: "Live",
+      genres: "Cricket",
+      match: "Live now",
+      description: "Nepal Premier League Season 3 live broadcast. Stream embed will be added when the link is ready.",
+      embedUrl: ""
+    },
+    {
+      id: "bajirao-mastani",
+      kind: "movie",
+      title: "Now Playing Bajirao Mastani for Ajit Dai",
+      year: "2015",
+      duration: "2h 37m",
+      genres: "Drama, Romance",
+      match: "98% Match",
+      description: "A war-time love story in which the warrior Bajirao (Ranveer Singh) falls for Mastani (Deepika Padukone) while married to Kashibai (Priyanka Chopra). A Hindi drama about sacrifice and the acceptance of love.",
+      embedUrl: "https://ok.ru/videoembed/4394229762723?nochat=1"
+    }
+  ];
+
+  const frame = document.getElementById("playerFrame");
+  const placeholder = document.getElementById("placeholder");
+  const titleEl = document.getElementById("title");
+  const metaEl = document.getElementById("meta");
+  const descEl = document.getElementById("description");
+  const cardsEl = document.getElementById("cards");
+  const navButtons = document.querySelectorAll("nav button");
+
+  let currentId = catalog[0].id;
+  let filter = "all";
+
+  function play(item) {
+    currentId = item.id;
+    document.title = item.title + " | Streamflix";
+    titleEl.textContent = item.title;
+    descEl.textContent = item.description;
+    metaEl.innerHTML = "";
+
+    const bits = [];
+    if (item.kind === "live") bits.push({ text: "LIVE", className: "live-pill" });
+    if (item.match) bits.push({ text: item.match, className: "match" });
+    bits.push({ text: item.year });
+    bits.push({ text: "HD", className: "badge" });
+    bits.push({ text: item.duration });
+    bits.push({ text: item.genres });
+
+    bits.forEach((bit) => {
+      const span = document.createElement("span");
+      if (bit.className) span.className = bit.className;
+      span.textContent = bit.text;
+      metaEl.appendChild(span);
+    });
+
+    if (item.embedUrl) {
+      placeholder.classList.remove("visible");
+      frame.style.display = "block";
+      frame.src = item.embedUrl;
+      frame.title = item.title;
+    } else {
+      frame.removeAttribute("src");
+      frame.style.display = "none";
+      placeholder.classList.add("visible");
+      placeholder.querySelector("h2").textContent = item.title;
+      placeholder.querySelector("p").textContent =
+        "Broadcast embed is empty for now. Paste the stream link when you have it.";
+    }
+
+    renderCards();
+  }
+
+  function renderCards() {
+    cardsEl.innerHTML = "";
+    catalog
+      .filter((item) => filter === "all" || item.kind === filter)
+      .forEach((item) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "card" + (item.kind === "live" ? " live-card" : "") + (item.id === currentId ? " active" : "");
+        card.innerHTML =
+          (item.kind === "live" ? '<span class="tag">LIVE</span>' : "") +
+          "<strong>" + item.title + "</strong>" +
+          "<span>" + item.year + " · " + item.genres + "</span>";
+        card.addEventListener("click", () => play(item));
+        cardsEl.appendChild(card);
+      });
+  }
+
+  navButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      filter = button.dataset.filter;
+      navButtons.forEach((b) => b.classList.toggle("active", b === button));
+      renderCards();
+    });
+  });
+
+  document.getElementById("fullscreenBtn").addEventListener("click", () => {
+    const target = frame.style.display === "none" ? document.querySelector(".player") : frame;
+    if (target.requestFullscreen) target.requestFullscreen();
+  });
+
+  document.getElementById("restartBtn").addEventListener("click", () => {
+    const item = catalog.find((entry) => entry.id === currentId);
+    if (!item) return;
+    if (item.embedUrl) {
+      frame.src = item.embedUrl;
+    } else {
+      play(item);
+    }
+  });
+
+  play(catalog[0]);
+</script>
+
+</body>
+</html>
