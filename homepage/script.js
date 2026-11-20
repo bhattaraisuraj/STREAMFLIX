@@ -41,7 +41,7 @@ const catalog = [
     genres: "Romance, Comedy, Drama",
     match: "New",
     description: "Ashley's homecoming from abroad takes an emotional turn when a wedding next door stirs memories of her first love, Justin.",
-    embedUrl: "https://www.movy.sx/movie/1508168?play=true"
+    embedUrl: "https://www.vidy.st/movie/1508168?play=true"
   }
 ];
 
