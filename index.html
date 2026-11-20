@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streamflix</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#">STREAMFLIX</a>
+  <nav>
+    <button type="button" data-filter="all" class="active">Home</button>
+    <button type="button" data-filter="live">Live</button>
+    <button type="button" data-filter="movie">Movies</button>
+  </nav>
+</header>
+
+<main class="stage">
+  <div class="player">
+    <iframe id="playerFrame" title="Video player" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+    <div id="placeholder" class="placeholder" aria-live="polite">
+      <span class="live-pill">LIVE</span>
+      <h2>NPL Season 3</h2>
+    </div>
+  </div>
+
+  <section class="info">
+    <h1 id="title"></h1>
+    <div class="meta" id="meta"></div>
+    <p id="description"></p>
+    <div class="actions">
+      <button class="btn primary" id="fullscreenBtn" type="button">Full screen</button>
+      <button class="btn secondary" id="restartBtn" type="button">Restart</button>
+    </div>
+  </section>
+
+  <section class="rail">
+    <h2>Now on Streamflix</h2>
+    <div class="cards" id="cards"></div>
+  </section>
+</main>
+
+<footer>&copy; 2026 Streamflix. All rights reserved.</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
