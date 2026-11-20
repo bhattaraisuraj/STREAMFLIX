@@ -1,0 +1,19 @@
+{
+  "name": "streamflix",
+  "version": "1.0.0",
+  "description": "Streamflix - A video streaming platform",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "streamflix",
+    "video",
+    "streaming"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
