@@ -31,6 +31,17 @@ const catalog = [
     match: "New",
     description: "A retired officer's peaceful life is disrupted when a dangerous criminal organization threatens his family. He must use his skills one final time to protect his loved ones and preserve his legacy. Directed and written by Nelson Dilipkumar. Starring Rajinikanth, Mohanlal and Shivarajkumar.",
     embedUrl: "https://www.vidy.st/movie/1234139?play=true"
+  },
+    {
+    id: "bethlehem-kudumba-unit",
+    kind: "movie",
+    title: "Bethlehem Kudumba Unit",
+    year: "2026",
+    duration: "2h 36m",
+    genres: "Romance, Comedy, Drama",
+    match: "New",
+    description: "Ashley's homecoming from abroad takes an emotional turn when a wedding next door stirs memories of her first love, Justin.",
+    embedUrl: "https://www.vidy.st/movie/1508168?play=true"
   }
 ];
 
